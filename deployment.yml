@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: noted-backend-deployment
+  labels:
+    app: noted-backend
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: noted-backend
+  template:
+    metadata:
+      labels:
+        app: noted-backend
+    spec:
+      containers:
+      - name: noted-backend
+        image: <your-docker-image>:<tag>
+        ports:
+        - containerPort: 3000
+        env:
+          - name: AWS_REGION
+            valueFrom:
+              configMapKeyRef:
+                name: noted-backend-config
+                key: AWS_REGION
+          - name: ENV_NAME
+            valueFrom:
+              configMapKeyRef:
+                name: noted-backend-config
+                key: ENV_NAME
+          - name: ALLOWED_HEADERS
+            valueFrom:
+              configMapKeyRef:
+                name: noted-backend-config
+                key: ALLOWED_HEADERS
+          - name: AWS_ACCESS_KEY_ID
+            valueFrom:
+              secretKeyRef:
+                name: aws-secret
+                key: AWS_ACCESS_KEY_ID
+          - name: AWS_SECRET_ACCESS_KEY
+            valueFrom:
+              secretKeyRef:
+                name: aws-secret
+                key: AWS_SECRET_ACCESS_KEY
