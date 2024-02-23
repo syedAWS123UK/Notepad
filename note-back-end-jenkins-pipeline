@@ -1,0 +1,43 @@
+pipeline {
+    agent any
+
+    stages {
+        stage('Checkout') {
+            steps {
+                // Checkout the source code from your Git repository
+                git branch: 'dev', url: 'https://github.com/syedAWS123UK/Notepad.git'
+            }
+        }
+
+        stage('Build') {
+            steps {
+                // Build your Docker image
+                script {
+                    docker.build('your-docker-image:latest')
+                }
+            }
+        }
+
+        stage('Test') {
+            steps {
+                // Run your tests
+                sh 'npm test'
+            }
+        }
+
+        stage('Deploy to Kubernetes') {
+            steps {
+                // Deploy your Docker image to Kubernetes
+                script {
+                    withCredentials([usernamePassword(credentialsId: 'your-kubernetes-credentials-id', passwordVariable: 'KUBE_PASSWORD', usernameVariable: 'KUBE_USERNAME')]) {
+                        sh 'kubectl config set-cluster your-cluster-name --server=https://your-cluster-url --certificate-authority=your-certificate-authority --embed-certs=true'
+                        sh 'kubectl config set-credentials $KUBE_USERNAME --token=$KUBE_PASSWORD'
+                        sh 'kubectl config set-context default-context --cluster=your-cluster-name --user=$KUBE_USERNAME'
+                        sh 'kubectl config use-context default-context'
+                        sh 'kubectl set image deployment/noted-backend-deployment noted-backend=<your-docker-image>:latest'
+                    }
+                }
+            }
+        }
+    }
+}
