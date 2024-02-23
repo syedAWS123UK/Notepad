@@ -1,5 +1,5 @@
 {
-  "name": "notes-backend",
+  "name": "sls-notes-backend",
   "version": "1.0.0",
   "description": "",
   "main": "handler.js",
